@@ -227,7 +227,7 @@ runs:
       shell: bash
       env:
         CFLAGS: -g
-        CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING
+        CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
         LDFLAGS: -static-libgcc -static-libstdc++
       run: |
         make features
