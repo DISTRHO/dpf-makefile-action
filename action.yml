@@ -328,7 +328,7 @@ runs:
                   --error-exitcode=255 \
                   --leak-check=full \
                   --track-origins=yes \
-                  --suppressions=./dpf/utils/valgrind-dpf.supp \
+                  --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native clap ./${p} "" 1>/dev/null; \
           done
     # upload artifacts (properties)
