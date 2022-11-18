@@ -19,7 +19,6 @@ inputs:
 env:
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
-  #WITH_LTO: ${{ toJSON(inputs.lto) }}
 
 outputs:
   release_filename:
@@ -41,6 +40,11 @@ runs:
         sudo apt-get update -qq
         sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
         sudo apt-get purge -yqq libclang* libgbm* libllvm* libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
+    # setup build options
+    - name: Setup build options
+      shell: bash
+      run: |
+        echo "WITH_LTO=${{ toJSON(inputs.lto) }}" >> $GITHUB_ENV
     # linux-arm64
     - name: Set up dependencies (linux-arm64)
       if: ${{ inputs.target == 'linux-arm64' }}
