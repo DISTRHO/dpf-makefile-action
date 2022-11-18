@@ -331,7 +331,7 @@ runs:
                   --suppressions=./dpf/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native clap ./${p} "" 1>/dev/null; \
           done
-    # upload artifacts
+    # upload artifacts (properties)
     - name: Set sha8
       shell: bash
       run: |
@@ -341,6 +341,14 @@ runs:
       run: |
         echo "ARTIFACT_BASENAME=${{ github.event.repository.name }}-${{ inputs.target }}-${{ github.event.pull_request.number || env.SHA8 }}" >> $GITHUB_ENV
         echo "RELEASE_BASENAME=${{ github.event.repository.name }}-${{ github.ref_name }}" >> $GITHUB_ENV
+    # create release archive (macOS exception)
+    - name: Create release archive (macOS)
+      if: ${{ startsWith(inputs.target, 'macos') }}
+      shell: bash
+      run: |
+        mv *-macOS.pkg ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg
+        echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg >> $GITHUB_ENV
+    # upload artifacts (action)
     - name: Upload artifacts (Linux)
       if: ${{ startsWith(inputs.target, 'linux') }}
       uses: actions/upload-artifact@v3
@@ -381,12 +389,6 @@ runs:
             --transform="s,^bin/,${{ env.RELEASE_BASENAME }}/," \
             bin/*
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.tar.xz >> $GITHUB_ENV
-    - name: Create release archive (macOS)
-      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') }}
-      shell: bash
-      run: |
-        mv *-macOS.pkg ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg
-        echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg >> $GITHUB_ENV
     - name: Create release archive (Windows)
       if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') }}
       shell: bash
