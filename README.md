@@ -76,18 +76,18 @@ The table below contains all possible properties for use with `distrho/dpf-makef
 
 The table below contains all possible targets and supported runners.
 
-| Target          | Aliases           | Allowed runners |
-| --------------- | ----------------- | --------------- |
-| linux-arm64     |                   | ubuntu-20.04    |
-| linux-armhf     |                   | ubuntu-20.04    |
-| linux-i686      | linux-i386        | ubuntu-20.04    |
-| linux-riscv64   |                   | ubuntu-20.04    |
-| linux-x86_64    | linux             | ubuntu-20.04    |
-| macos-intel     |                   | macos-11        |
-| macos-universal | macos             | macos-11        |
-| win32           |                   | ubuntu-20.04    |
-| win64           |                   | ubuntu-20.04    |
-| pluginval       | plugin-validation | ubuntu-20.04    |
+| Target          | Aliases           | Allowed runners            |
+| --------------- | ----------------- | -------------------------- |
+| linux-arm64     |                   | ubuntu-20.04, ubuntu-22.04 |
+| linux-armhf     |                   | ubuntu-20.04, ubuntu-22.04 |
+| linux-i686      | linux-i386        | ubuntu-20.04, ubuntu-22.04 |
+| linux-riscv64   |                   | ubuntu-20.04, ubuntu-22.04 |
+| linux-x86_64    | linux             | ubuntu-20.04, ubuntu-22.04 |
+| macos-intel     |                   | macos-11, macos-12         |
+| macos-universal | macos             | macos-11, macos-12         |
+| win32           |                   | ubuntu-20.04, ubuntu-22.04 |
+| win64           |                   | ubuntu-20.04, ubuntu-22.04 |
+| pluginval       | plugin-validation | ubuntu-20.04, ubuntu-22.04 |
 
 NOTE: Windows builds use ubuntu runners in cross-compilation instead of Windows ones
 
@@ -100,6 +100,4 @@ Initial release
 ## Future Plans
 
 - Integrate with [PawPaw](https://github.com/DISTRHO/PawPaw/) to allow plugins to use many opensource libs seamlessly
-- Support linux/windows builds with ubuntu-22.04 runner
-- Support macOS builds with macos-12 runner
 - Set up MOD Audio builds
