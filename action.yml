@@ -320,6 +320,7 @@ runs:
             /usr/lib/lv2/kx-meta/*.ttl \
             /usr/lib/lv2/kx-control-input-port-change-request.lv2/*.ttl \
             /usr/lib/lv2/kx-programs.lv2/*.ttl \
+            /usr/lib/lv2/kx-properties.lv2/*.ttl \
             ./bin/*.lv2/*.ttl
     - name: Validate LV2 metadata and binaries
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
@@ -328,7 +329,7 @@ runs:
         export LV2_PATH=/tmp/lv2-path
         mkdir ${LV2_PATH}
         mv bin/*.lv2 ${LV2_PATH}/
-        cp -r /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,instance-access,midi,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 ${LV2_PATH}/
+        cp -r /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,kx-properties,instance-access,midi,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 ${LV2_PATH}/
         lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
     - name: Test LADSPA plugins
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
