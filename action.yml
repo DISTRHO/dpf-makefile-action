@@ -24,10 +24,6 @@ inputs:
     required: false
     default: true
 
-env:
-  DEBIAN_FRONTEND: noninteractive
-  HOMEBREW_NO_AUTO_UPDATE: 1
-
 outputs:
   release_filename:
     description: "Filename of generated release artifact"
@@ -39,7 +35,17 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # fixup dependencies
+    - name: Setup env
+      shell: bash
+      run: |
+        echo "DEBIAN_FRONTEND=noninteractive" >> $GITHUB_ENV
+        echo "HOMEBREW_NO_AUTO_UPDATE=1" >> $GITHUB_ENV
+        echo "HOMEBREW_NO_INSTALL_CLEANUP=1" >> $GITHUB_ENV
+        echo "LIBGL_ALWAYS_SOFTWARE=true" >> $GITHUB_ENV
+        echo "PAWPAW_CACHE_VERSION=1" >> $GITHUB_ENV
+        echo "PAWPAW_COMMIT_HASH=f80a80c05ad74a287e921e3c36698497b7f94ece" >> $GITHUB_ENV
+        echo "PAWPAW_SKIP_GLIB=1" >> $GITHUB_ENV
+        echo "PAWPAW_SKIP_LV2=1" >> $GITHUB_ENV
     - name: Fix GitHub's mess (detect version)
       if: ${{ runner.os == 'Linux' }}
       shell: bash
@@ -69,7 +75,26 @@ runs:
     - name: Setup build options
       shell: bash
       run: |
-        echo "WITH_LTO=${{ toJSON(inputs.lto) }}" >> $GITHUB_ENV
+        # lto for regular build
+        echo "WITH_LTO=${{ inputs.lto }}" >> $GITHUB_ENV
+        # pawpaw lto
+        PAWPAW_SKIP_LTO=1
+        [[ "${{ inputs.lto }}" = "true" ]] && PAWPAW_SKIP_LTO=0
+        echo "PAWPAW_SKIP_LTO=${PAWPAW_SKIP_LTO}" >> $GITHUB_ENV
+        # pawpaw target
+        PAWPAW_TARGET="${{ inputs.target }}"
+        [[ "${PAWPAW_TARGET}" = "linux" || "${PAWPAW_TARGET}" = "pluginval" || "${PAWPAW_TARGET}" = "plugin-validation" ]] && PAWPAW_TARGET=linux-x86_64
+        [[ "${PAWPAW_TARGET}" = "macos" ]] && PAWPAW_TARGET=macos-universal
+        [[ "${PAWPAW_TARGET}" = "macos-intel" ]] && PAWPAW_TARGET=macos
+        echo "PAWPAW_TARGET=${PAWPAW_TARGET}" >> $GITHUB_ENV
+
+    # setup build cache
+    - name: Setup build cache
+      if: ${{ inputs.pawpaw == 'true' }}
+      uses: actions/cache@v3
+      with:
+        path: ~/PawPawBuilds
+        key: pawpaw-${{ inputs.target }}-v${{ env.PAWPAW_CACHE_VERSION }}-${{ env.WITH_LTO }}
 
     # setup dependencies
     - name: Setup dependencies (linux-arm64)
@@ -154,7 +179,14 @@ runs:
         sudo apt-get clean
 
     # build dependencies
-    # TODO add pawpaw here
+    - name: Build dependencies through PawPaw
+      if: ${{ inputs.pawpaw == 'true' }}
+      shell: bash
+      run: |
+        git clone https://github.com/DISTRHO/PawPaw.git
+        git -C PawPaw checkout ${{ env.PAWPAW_COMMIT_HASH }}
+        ./PawPaw/bootstrap-plugins.sh ${{ env.PAWPAW_TARGET }}
+        ./PawPaw/.cleanup.sh ${{ env.PAWPAW_TARGET }}
 
     # build plugins
     - name: Build linux arm64 cross-compiled
@@ -166,6 +198,7 @@ runs:
         LDFLAGS: -static-libgcc -static-libstdc++
         PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make -j $(nproc)
     - name: Build linux armhf cross-compiled
@@ -177,6 +210,7 @@ runs:
         LDFLAGS: -static-libgcc -static-libstdc++
         PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make -j $(nproc)
     - name: Build linux i686
@@ -190,6 +224,7 @@ runs:
         LDFLAGS: -m32 -static-libgcc -static-libstdc++
         PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make -j $(nproc)
     - name: Build linux riscv64 cross-compiled
@@ -201,6 +236,7 @@ runs:
         LDFLAGS: -static-libgcc -static-libstdc++
         PKG_CONFIG_PATH: /usr/lib/riscv64-linux-gnu/pkgconfig
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make -j $(nproc)
     - name: Build linux x86_64
@@ -209,6 +245,7 @@ runs:
       env:
         LDFLAGS: -static-libgcc -static-libstdc++
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make -j $(nproc)
     - name: Build macOS intel
@@ -219,6 +256,7 @@ runs:
         CXXFLAGS: -arch x86_64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_8 -mmacosx-version-min=10.8 -stdlib=libc++
         LDFLAGS: -arch x86_64 -mmacosx-version-min=10.8 -stdlib=libc++
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make HAVE_CAIRO=false -j $(sysctl -n hw.logicalcpu)
         ${{ inputs.dpf_path }}/utils/package-osx-bundles.sh
@@ -230,6 +268,7 @@ runs:
         CXXFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
         LDFLAGS: -arch x86_64 -arch arm64 -mmacosx-version-min=10.12
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make HAVE_CAIRO=false NOOPT=true -j $(sysctl -n hw.logicalcpu)
         ${{ inputs.dpf_path }}/utils/package-osx-bundles.sh
@@ -243,6 +282,7 @@ runs:
         PKG_CONFIG: "false"
         WINEDEBUG: "-all"
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make -j $(nproc)
     - name: Build win64 cross-compiled
@@ -255,6 +295,7 @@ runs:
         PKG_CONFIG: "false"
         WINEDEBUG: "-all"
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make -j $(nproc)
     - name: Build plugins
@@ -265,6 +306,7 @@ runs:
         CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
         LDFLAGS: -static-libgcc -static-libstdc++
       run: |
+        ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
         make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
 
@@ -420,33 +462,33 @@ runs:
 
     # create release archive
     - name: Create release archive (Linux)
-      if: ${{ startsWith(inputs.target, 'linux') && startsWith(github.ref, 'refs/tags/') }} && ${{ inputs.release }}
+      if: ${{ startsWith(inputs.target, 'linux') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' }}
       shell: bash
       run: |
-        cp ${{ inputs.dpf_path }}/utils/README-Linux.txt bin/README.txt
         tar chJf ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.tar.xz \
             --transform="s,^bin/,${{ env.RELEASE_BASENAME }}/," \
             bin/*
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.tar.xz >> $GITHUB_ENV
     - name: Create release archive (macOS)
-      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') }} && ${{ inputs.release }}
+      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' }}
       shell: bash
       run: |
         mv *-macOS.pkg ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg >> $GITHUB_ENV
     - name: Create release archive (Windows)
-      if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') }} && ${{ inputs.release }}
+      if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' }}
       shell: bash
       run: |
-        cp ${{ inputs.dpf_path }}/utils/README-Windows.txt bin/README.txt
         mv bin ${{ env.RELEASE_BASENAME }}
-        zip -r -9 build.zip ${{ env.RELEASE_BASENAME }}/* -x ${{ env.RELEASE_BASENAME }}/*-ladspa.dll -x ${{ env.RELEASE_BASENAME }}/*-dssi.dll
-        mv build.zip ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.zip
+        zip -r -9 ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.zip \
+            ${{ env.RELEASE_BASENAME }}/* \
+            -x ${{ env.RELEASE_BASENAME }}/*-ladspa.dll \
+            -x ${{ env.RELEASE_BASENAME }}/*-dssi.dll
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.zip >> $GITHUB_ENV
 
     # upload release archive
     - uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/') && ${{ inputs.release }}
+      if: ${{ startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' }}
       with:
         tag_name: ${{ github.ref_name }}
         name: ${{ github.ref_name }}
