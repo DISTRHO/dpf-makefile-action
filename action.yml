@@ -15,6 +15,10 @@ inputs:
     description: 'Relative path to DPF submodule'
     required: false
     default: 'dpf'
+  pawpaw:
+    description: 'Install and setup extra libraries'
+    required: false
+    default: false
   release:
     description: 'Automatically upload releases'
     required: false
@@ -35,7 +39,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # setup dependencies
+    # fixup dependencies
     - name: Fix GitHub's mess (detect version)
       if: ${{ runner.os == 'Linux' }}
       shell: bash
@@ -60,13 +64,15 @@ runs:
         sudo apt-get install -yqq --allow-downgrades libgd3/jammy
         sudo apt-get purge -yqq libclang* libgbm* libllvm* libmono* moby* mono* msbuild* php* libgdiplus libpcre2-posix3 libzip4
         sudo apt-get clean
+
     # setup build options
     - name: Setup build options
       shell: bash
       run: |
         echo "WITH_LTO=${{ toJSON(inputs.lto) }}" >> $GITHUB_ENV
-    # linux-arm64
-    - name: Set up dependencies (linux-arm64)
+
+    # setup dependencies
+    - name: Setup dependencies (linux-arm64)
       if: ${{ inputs.target == 'linux-arm64' }}
       shell: bash
       run: |
@@ -78,19 +84,7 @@ runs:
         sudo apt-get update -qq
         sudo apt-get install -yqq g++-aarch64-linux-gnu libasound2-dev:arm64 libcairo2-dev:arm64 libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 liblo-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 qemu-user-static
         sudo apt-get clean
-    - name: Build linux arm64 cross-compiled
-      if: ${{ inputs.target == 'linux-arm64' }}
-      shell: bash
-      env:
-        CC: aarch64-linux-gnu-gcc
-        CXX: aarch64-linux-gnu-g++
-        LDFLAGS: -static-libgcc -static-libstdc++
-        PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
-      run: |
-        make features
-        make -j $(nproc)
-    # linux-armhf
-    - name: Set up dependencies (linux-armhf)
+    - name: Setup dependencies (linux-armhf)
       if: ${{ inputs.target == 'linux-armhf' }}
       shell: bash
       run: |
@@ -102,19 +96,7 @@ runs:
         sudo apt-get update -qq
         sudo apt-get install -yqq g++-arm-linux-gnueabihf libasound2-dev:armhf libcairo2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf liblo-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf qemu-user-static
         sudo apt-get clean
-    - name: Build linux armhf cross-compiled
-      if: ${{ inputs.target == 'linux-armhf' }}
-      shell: bash
-      env:
-        CC: arm-linux-gnueabihf-gcc
-        CXX: arm-linux-gnueabihf-g++
-        LDFLAGS: -static-libgcc -static-libstdc++
-        PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
-      run: |
-        make features
-        make -j $(nproc)
-    # linux-i686
-    - name: Set up dependencies (linux-i686)
+    - name: Setup dependencies (linux-i686)
       if: ${{ inputs.target == 'linux-i386' || inputs.target == 'linux-i686' }}
       shell: bash
       run: |
@@ -122,21 +104,7 @@ runs:
         sudo apt-get update -qq
         sudo apt-get install -yqq g++-i686-linux-gnu libasound2-dev:i386 libcairo2-dev:i386 libdbus-1-dev:i386 libgl1-mesa-dev:i386 liblo-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386
         sudo apt-get clean
-    - name: Build linux i686
-      if: ${{ inputs.target == 'linux-i386' || inputs.target == 'linux-i686' }}
-      shell: bash
-      env:
-        CC: i686-linux-gnu-gcc
-        CXX: i686-linux-gnu-g++
-        CFLAGS: -m32
-        CXXFLAGS: -m32
-        LDFLAGS: -m32 -static-libgcc -static-libstdc++
-        PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
-      run: |
-        make features
-        make -j $(nproc)
-    # linux-riscv64
-    - name: Set up dependencies (linux-riscv64)
+    - name: Setup dependencies (linux-riscv64)
       if: ${{ inputs.target == 'linux-riscv64' }}
       shell: bash
       run: |
@@ -148,59 +116,14 @@ runs:
         sudo apt-get update -qq
         sudo apt-get install -yqq g++-riscv64-linux-gnu libasound2-dev:riscv64 libcairo2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglvnd0:riscv64 liblo-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 qemu-user-static
         sudo apt-get clean
-    - name: Build linux riscv64 cross-compiled
-      if: ${{ inputs.target == 'linux-riscv64' }}
-      shell: bash
-      env:
-        CC: riscv64-linux-gnu-gcc
-        CXX: riscv64-linux-gnu-g++
-        LDFLAGS: -static-libgcc -static-libstdc++
-        PKG_CONFIG_PATH: /usr/lib/riscv64-linux-gnu/pkgconfig
-      run: |
-        make features
-        make -j $(nproc)
-    # linux-x86_64
-    - name: Set up dependencies (linux-x86_64)
+    - name: Setup dependencies (linux-x86_64)
       if: ${{ inputs.target == 'linux-x86_64' || inputs.target == 'linux' }}
       shell: bash
       run: |
         sudo apt-get update -qq
         sudo apt-get install -yqq libasound2-dev libcairo2-dev libdbus-1-dev libgl1-mesa-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev
         sudo apt-get clean
-    - name: Build linux x86_64
-      if: ${{ inputs.target == 'linux-x86_64' || inputs.target == 'linux' }}
-      shell: bash
-      env:
-        LDFLAGS: -static-libgcc -static-libstdc++
-      run: |
-        make features
-        make -j $(nproc)
-    # macos-intel
-    - name: Build macOS intel
-      if: ${{ inputs.target == 'macos-intel' }}
-      shell: bash
-      env:
-        CFLAGS: -arch x86_64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_8 -mmacosx-version-min=10.8 -stdlib=libc++
-        CXXFLAGS: -arch x86_64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_8 -mmacosx-version-min=10.8 -stdlib=libc++
-        LDFLAGS: -arch x86_64 -mmacosx-version-min=10.8 -stdlib=libc++
-      run: |
-        make features
-        make HAVE_CAIRO=false -j $(sysctl -n hw.logicalcpu)
-        ${{ inputs.dpf_path }}/utils/package-osx-bundles.sh
-    # macos-universal
-    - name: Build macOS universal
-      if: ${{ inputs.target == 'macos-universal' || inputs.target == 'macos' }}
-      shell: bash
-      env:
-        CFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
-        CXXFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
-        LDFLAGS: -arch x86_64 -arch arm64 -mmacosx-version-min=10.12
-      run: |
-        make features
-        make HAVE_CAIRO=false NOOPT=true -j $(sysctl -n hw.logicalcpu)
-        ${{ inputs.dpf_path }}/utils/package-osx-bundles.sh
-    # win32
-    - name: Set up dependencies (win32)
+    - name: Setup dependencies (win32)
       if: ${{ inputs.target == 'win32' }}
       shell: bash
       run: |
@@ -208,40 +131,14 @@ runs:
         sudo apt-get update -qq
         sudo apt-get install -yqq binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386
         sudo apt-get clean
-    - name: Build win32 cross-compiled
-      if: ${{ inputs.target == 'win32' }}
-      shell: bash
-      env:
-        CC: i686-w64-mingw32-gcc
-        CXX: i686-w64-mingw32-g++
-        EXE_WRAPPER: wine
-        PKG_CONFIG: "false"
-        WINEDEBUG: "-all"
-      run: |
-        make features
-        make -j $(nproc)
-    # win64
-    - name: Set up dependencies (win64)
+    - name: Setup dependencies (win64)
       if: ${{ inputs.target == 'win64' }}
       shell: bash
       run: |
         sudo apt-get update -qq
         sudo apt-get install -yqq binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable
         sudo apt-get clean
-    - name: Build win64 cross-compiled
-      if: ${{ inputs.target == 'win64' }}
-      shell: bash
-      env:
-        CC: x86_64-w64-mingw32-gcc
-        CXX: x86_64-w64-mingw32-g++
-        EXE_WRAPPER: wine
-        PKG_CONFIG: "false"
-        WINEDEBUG: "-all"
-      run: |
-        make features
-        make -j $(nproc)
-    # pluginval
-    - name: Set up dependencies
+    - name: Setup dependencies (pluginval)
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
       shell: bash
       run: |
@@ -255,6 +152,111 @@ runs:
         sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
         # cleanup
         sudo apt-get clean
+
+    # build dependencies
+    # TODO add pawpaw here
+
+    # build plugins
+    - name: Build linux arm64 cross-compiled
+      if: ${{ inputs.target == 'linux-arm64' }}
+      shell: bash
+      env:
+        CC: aarch64-linux-gnu-gcc
+        CXX: aarch64-linux-gnu-g++
+        LDFLAGS: -static-libgcc -static-libstdc++
+        PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
+      run: |
+        make features
+        make -j $(nproc)
+    - name: Build linux armhf cross-compiled
+      if: ${{ inputs.target == 'linux-armhf' }}
+      shell: bash
+      env:
+        CC: arm-linux-gnueabihf-gcc
+        CXX: arm-linux-gnueabihf-g++
+        LDFLAGS: -static-libgcc -static-libstdc++
+        PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
+      run: |
+        make features
+        make -j $(nproc)
+    - name: Build linux i686
+      if: ${{ inputs.target == 'linux-i386' || inputs.target == 'linux-i686' }}
+      shell: bash
+      env:
+        CC: i686-linux-gnu-gcc
+        CXX: i686-linux-gnu-g++
+        CFLAGS: -m32
+        CXXFLAGS: -m32
+        LDFLAGS: -m32 -static-libgcc -static-libstdc++
+        PKG_CONFIG_PATH: /usr/lib/i386-linux-gnu/pkgconfig
+      run: |
+        make features
+        make -j $(nproc)
+    - name: Build linux riscv64 cross-compiled
+      if: ${{ inputs.target == 'linux-riscv64' }}
+      shell: bash
+      env:
+        CC: riscv64-linux-gnu-gcc
+        CXX: riscv64-linux-gnu-g++
+        LDFLAGS: -static-libgcc -static-libstdc++
+        PKG_CONFIG_PATH: /usr/lib/riscv64-linux-gnu/pkgconfig
+      run: |
+        make features
+        make -j $(nproc)
+    - name: Build linux x86_64
+      if: ${{ inputs.target == 'linux-x86_64' || inputs.target == 'linux' }}
+      shell: bash
+      env:
+        LDFLAGS: -static-libgcc -static-libstdc++
+      run: |
+        make features
+        make -j $(nproc)
+    - name: Build macOS intel
+      if: ${{ inputs.target == 'macos-intel' }}
+      shell: bash
+      env:
+        CFLAGS: -arch x86_64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_8 -mmacosx-version-min=10.8 -stdlib=libc++
+        CXXFLAGS: -arch x86_64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_8 -mmacosx-version-min=10.8 -stdlib=libc++
+        LDFLAGS: -arch x86_64 -mmacosx-version-min=10.8 -stdlib=libc++
+      run: |
+        make features
+        make HAVE_CAIRO=false -j $(sysctl -n hw.logicalcpu)
+        ${{ inputs.dpf_path }}/utils/package-osx-bundles.sh
+    - name: Build macOS universal
+      if: ${{ inputs.target == 'macos-universal' || inputs.target == 'macos' }}
+      shell: bash
+      env:
+        CFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
+        CXXFLAGS: -arch x86_64 -arch arm64 -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_12 -mmacosx-version-min=10.12 -mtune=generic -msse -msse2
+        LDFLAGS: -arch x86_64 -arch arm64 -mmacosx-version-min=10.12
+      run: |
+        make features
+        make HAVE_CAIRO=false NOOPT=true -j $(sysctl -n hw.logicalcpu)
+        ${{ inputs.dpf_path }}/utils/package-osx-bundles.sh
+    - name: Build win32 cross-compiled
+      if: ${{ inputs.target == 'win32' }}
+      shell: bash
+      env:
+        CC: i686-w64-mingw32-gcc
+        CXX: i686-w64-mingw32-g++
+        EXE_WRAPPER: wine
+        PKG_CONFIG: "false"
+        WINEDEBUG: "-all"
+      run: |
+        make features
+        make -j $(nproc)
+    - name: Build win64 cross-compiled
+      if: ${{ inputs.target == 'win64' }}
+      shell: bash
+      env:
+        CC: x86_64-w64-mingw32-gcc
+        CXX: x86_64-w64-mingw32-g++
+        EXE_WRAPPER: wine
+        PKG_CONFIG: "false"
+        WINEDEBUG: "-all"
+      run: |
+        make features
+        make -j $(nproc)
     - name: Build plugins
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
       shell: bash
@@ -265,6 +267,8 @@ runs:
       run: |
         make features
         make NOOPT=true SKIP_STRIPPING=true -j $(nproc)
+
+    # pluginval
     - name: Validate LV2 ttl syntax
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
       shell: bash
@@ -363,6 +367,7 @@ runs:
                   --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native clap ./${p} "" 1>/dev/null; \
           done
+
     # upload artifacts (properties)
     - name: Set sha8
       shell: bash
@@ -373,12 +378,14 @@ runs:
       run: |
         echo "ARTIFACT_BASENAME=${{ github.event.repository.name }}-${{ inputs.target }}-${{ github.event.pull_request.number || env.SHA8 }}" >> $GITHUB_ENV
         echo "RELEASE_BASENAME=${{ github.event.repository.name }}-${{ github.ref_name }}" >> $GITHUB_ENV
+
     # create release archive (macOS exception)
     - name: Create release archive (macOS non-release)
       if: ${{ startsWith(inputs.target, 'macos') }}
       shell: bash
       run: |
         cp *-macOS.pkg ${{ env.ARTIFACT_BASENAME }}.pkg
+
     # upload artifacts (action)
     - name: Upload artifacts (Linux)
       if: ${{ startsWith(inputs.target, 'linux') }}
@@ -410,31 +417,33 @@ runs:
           bin/*
           !bin/*-ladspa.dll
           !bin/*-dssi*
+
     # create release archive
     - name: Create release archive (Linux)
-      if: ${{ startsWith(inputs.target, 'linux') && startsWith(github.ref, 'refs/tags/') }}
+      if: ${{ startsWith(inputs.target, 'linux') && startsWith(github.ref, 'refs/tags/') }} && ${{ inputs.release }}
       shell: bash
       run: |
-        cp utils/README-Linux.txt bin/README.txt
+        cp ${{ inputs.dpf_path }}/utils/README-Linux.txt bin/README.txt
         tar chJf ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.tar.xz \
             --transform="s,^bin/,${{ env.RELEASE_BASENAME }}/," \
             bin/*
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.tar.xz >> $GITHUB_ENV
     - name: Create release archive (macOS)
-      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') }}
+      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') }} && ${{ inputs.release }}
       shell: bash
       run: |
         mv *-macOS.pkg ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg >> $GITHUB_ENV
     - name: Create release archive (Windows)
-      if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') }}
+      if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') }} && ${{ inputs.release }}
       shell: bash
       run: |
-        cp utils/README-Windows.txt bin/README.txt
+        cp ${{ inputs.dpf_path }}/utils/README-Windows.txt bin/README.txt
         mv bin ${{ env.RELEASE_BASENAME }}
         zip -r -9 build.zip ${{ env.RELEASE_BASENAME }}/* -x ${{ env.RELEASE_BASENAME }}/*-ladspa.dll -x ${{ env.RELEASE_BASENAME }}/*-dssi.dll
         mv build.zip ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.zip
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.zip >> $GITHUB_ENV
+
     # upload release archive
     - uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/') && ${{ inputs.release }}

@@ -73,6 +73,7 @@ The table below contains all possible properties for use with `distrho/dpf-makef
 | target   | Yes       | The target platform and architecture to build for          |
 | dpf_path | No        | Where DPF is located within your repo, defaults to "./dpf" |
 | lto      | No        | Whether to enable Link-Time-Optimizations, defaults to no  |
+| pawpaw   | No        | Whether to use [PawPaw](https://github.com/DISTRHO/PawPaw/) to install and setup extra libraries |
 | release  | No        | Whether to automatically upload releases, defaults to yes  |
 
 The table below contains all possible targets and supported runners.
