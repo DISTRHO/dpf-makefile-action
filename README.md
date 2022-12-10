@@ -101,5 +101,4 @@ Initial release
 
 ## Future Plans
 
-- Integrate with [PawPaw](https://github.com/DISTRHO/PawPaw/) to allow plugins to use many opensource libs seamlessly
 - Set up MOD Audio builds

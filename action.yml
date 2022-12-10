@@ -305,6 +305,7 @@ runs:
         CFLAGS: -g
         CXXFLAGS: -g -DDPF_ABORT_ON_ERROR -DDPF_RUNTIME_TESTING -Wno-pmf-conversions
         LDFLAGS: -static-libgcc -static-libstdc++
+        PAWPAW_SKIP_STRIPPING: 1
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make features
