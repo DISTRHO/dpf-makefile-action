@@ -71,27 +71,31 @@ The table below contains all possible properties for use with `distrho/dpf-makef
 | Property | Required? | Description                                                |
 | -------- | --------- | ---------------------------------------------------------- |
 | target   | Yes       | The target platform and architecture to build for          |
-| dpf_path | No        | Where DPF is located within your repo, defaults to "./dpf" |
 | lto      | No        | Whether to enable Link-Time-Optimizations, defaults to no  |
-| pawpaw   | No        | Whether to use [PawPaw](https://github.com/DISTRHO/PawPaw/) to install and setup extra libraries |
+| dpf_path | No        | Where DPF is located within your repo, defaults to "./dpf" |
+| pawpaw   | No        | Whether to use [PawPaw](https://github.com/DISTRHO/PawPaw/) to install and setup extra libraries, defaults to no |
 | release  | No        | Whether to automatically upload releases, defaults to yes  |
 
 The table below contains all possible targets and supported runners.
 
-| Target          | Aliases           | Allowed runners            |
-| --------------- | ----------------- | -------------------------- |
-| linux-arm64     |                   | ubuntu-20.04, ubuntu-22.04 |
-| linux-armhf     |                   | ubuntu-20.04, ubuntu-22.04 |
-| linux-i686      | linux-i386        | ubuntu-20.04, ubuntu-22.04 |
-| linux-riscv64   |                   | ubuntu-20.04, ubuntu-22.04 |
-| linux-x86_64    | linux             | ubuntu-20.04, ubuntu-22.04 |
-| macos-intel     |                   | macos-11, macos-12         |
-| macos-universal | macos             | macos-11, macos-12         |
-| win32           |                   | ubuntu-20.04, ubuntu-22.04 |
-| win64           |                   | ubuntu-20.04, ubuntu-22.04 |
-| pluginval       | plugin-validation | ubuntu-20.04, ubuntu-22.04 |
+| Target          | Aliases               | Allowed runners            |
+| --------------- | --------------------- | -------------------------- |
+| linux-arm64     |                       | ubuntu-20.04, ubuntu-22.04 |
+| linux-armhf     |                       | ubuntu-20.04, ubuntu-22.04 |
+| linux-i686      | linux-i386            | ubuntu-20.04, ubuntu-22.04 |
+| linux-riscv64   |                       | ubuntu-20.04, ubuntu-22.04 |
+| linux-x86_64    | linux                 | ubuntu-20.04, ubuntu-22.04 |
+| macos-intel     |                       | macos-11, macos-12         |
+| macos-universal | macos                 | macos-11, macos-12         |
+| macos-10.15     | macos-universal-10.15 | macos-11, macos-12         |
+| win32           |                       | ubuntu-20.04, ubuntu-22.04 |
+| win64           |                       | ubuntu-20.04, ubuntu-22.04 |
+| pluginval       | plugin-validation     | ubuntu-20.04, ubuntu-22.04 |
 
-NOTE: Windows builds use ubuntu runners in cross-compilation instead of Windows ones
+Notes:
+ - macos-intel uses 10.8 as minimum version
+ - macos-universal uses 10.12 as minimum version
+ - Windows builds use Ubuntu runners in cross-compilation instead of Windows ones
 
 ## Changelog
 
