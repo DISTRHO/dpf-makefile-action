@@ -148,6 +148,11 @@ runs:
         sudo apt-get update -qq
         sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
         sudo apt-get clean
+    - name: Setup dependencies (macOS)
+      if: ${{ startsWith(inputs.target, 'macos') }}
+      shell: bash
+      run: |
+        brew uninstall ant cairo harfbuzz kotlin maven openjdk r sbt selenium-server
     - name: Setup dependencies (win32)
       if: ${{ inputs.target == 'win32' }}
       shell: bash
@@ -354,6 +359,7 @@ runs:
                   --error-exitcode=255 \
                   --leak-check=full \
                   --track-origins=yes \
+                  --keep-debuginfo=yes \
                   --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native ladspa ./bin/${p} "" 1>/dev/null; \
           done
@@ -367,6 +373,7 @@ runs:
                   --error-exitcode=255 \
                   --leak-check=full \
                   --track-origins=yes \
+                  --keep-debuginfo=yes \
                   --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native dssi ./bin/${p} "" 1>/dev/null; \
           done
@@ -381,6 +388,7 @@ runs:
                   --error-exitcode=255 \
                   --leak-check=full \
                   --track-origins=yes \
+                  --keep-debuginfo=yes \
                   --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native lv2 "" ${p} 1>/dev/null; \
           done
@@ -394,6 +402,7 @@ runs:
                   --error-exitcode=255 \
                   --leak-check=full \
                   --track-origins=yes \
+                  --keep-debuginfo=yes \
                   --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native vst2 ./${p} "" 1>/dev/null; \
           done
@@ -407,6 +416,7 @@ runs:
                   --error-exitcode=255 \
                   --leak-check=full \
                   --track-origins=yes \
+                  --keep-debuginfo=yes \
                   --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native vst3 ./bin/${p} "" 1>/dev/null; \
           done
@@ -420,6 +430,7 @@ runs:
                   --error-exitcode=255 \
                   --leak-check=full \
                   --track-origins=yes \
+                  --keep-debuginfo=yes \
                   --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native clap ./${p} "" 1>/dev/null; \
           done
