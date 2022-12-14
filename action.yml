@@ -152,7 +152,7 @@ runs:
       if: ${{ startsWith(inputs.target, 'macos') }}
       shell: bash
       run: |
-        brew uninstall ant cairo harfbuzz kotlin maven openjdk r sbt selenium-server
+        brew uninstall --ignore-dependencies cairo
     - name: Setup dependencies (win32)
       if: ${{ inputs.target == 'win32' }}
       shell: bash
