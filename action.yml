@@ -15,6 +15,10 @@ inputs:
     description: 'Relative path to DPF submodule'
     required: false
     default: 'dpf'
+  faust:
+    description: 'Install faust'
+    required: false
+    default: false
   pawpaw:
     description: 'Install and setup extra libraries'
     required: false
@@ -183,6 +187,31 @@ runs:
         sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
         # cleanup
         sudo apt-get clean
+
+    # install faust (optional)
+    - name: Cache faust debs
+      if: ${{ inputs.faust == 'true' && runner.os == 'Linux' }}
+      uses: actions/cache@v3
+      with:
+        path: ~/faustdebs
+        key: faustdebs
+    - name: Install faust (non-macOS)
+      if: ${{ inputs.faust == 'true' && runner.os == 'Linux' }}
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -yqq libllvm10 libmicrohttpd12 libsndfile1
+        mkdir -p ~/faustdebs
+        wget -c -P ~/faustdebs \
+          https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/faust_2.41.1~ds0-0_amd64.deb \
+          https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/faust-common_2.41.1~ds0-0_all.deb \
+          https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/libfaust2_2.41.1~ds0-0_amd64.deb
+        sudo dpkg -i ~/faustdebs/*.deb
+    - name: Install faust (macOS)
+      if: ${{ inputs.faust == 'true' && startsWith(inputs.target, 'macos') }}
+      shell: bash
+      run: |
+        brew install faust
 
     # build dependencies
     - name: Build dependencies through PawPaw
