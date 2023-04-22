@@ -62,6 +62,16 @@ jobs:
       - uses: distrho/dpf-makefile-action@v1
         with:
           target: pluginval
+
+  source:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: distrho/dpf-makefile-action@v1
+        with:
+          target: source
 ```
 
 ## Documentation
@@ -73,6 +83,7 @@ The table below contains all possible properties for use with `distrho/dpf-makef
 | target   | Yes       | The target platform and architecture to build for          |
 | lto      | No        | Whether to enable Link-Time-Optimizations, defaults to no  |
 | dpf_path | No        | Where DPF is located within your repo, defaults to "./dpf" |
+| faust    | No        | Whether to install `faust`                                 |
 | pawpaw   | No        | Whether to use [PawPaw](https://github.com/DISTRHO/PawPaw/) to install and setup extra libraries, defaults to no |
 | release  | No        | Whether to automatically upload releases, defaults to yes  |
 
@@ -91,6 +102,7 @@ The table below contains all possible targets and supported runners.
 | win32           |                       | ubuntu-20.04, ubuntu-22.04 |
 | win64           |                       | ubuntu-20.04, ubuntu-22.04 |
 | pluginval       | plugin-validation     | ubuntu-20.04, ubuntu-22.04 |
+| source          |                       | ubuntu-20.04, ubuntu-22.04 |
 
 Notes:
  - macos-intel uses 10.8 as minimum version
