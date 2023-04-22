@@ -546,6 +546,18 @@ runs:
             -x ${{ env.RELEASE_BASENAME }}/*-ladspa.dll \
             -x ${{ env.RELEASE_BASENAME }}/*-dssi.dll
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.zip >> $GITHUB_ENV
+    - name: Create release archive (Source)
+      if: ${{ startsWith(inputs.target, 'source') }}
+      shell: bash
+      run: |
+        tar chJf ../${{ env.RELEASE_BASENAME }}-src.tar.xz \
+            --exclude=".git*" \
+            --transform='s,^\.\.,-.-.,' \
+            --transform='s,^\.,${{ env.RELEASE_BASENAME }},' \
+            --transform='s,^-\.-\.,..,' \
+            .
+        mv ../${{ env.RELEASE_BASENAME }}-src.tar.xz .
+        echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-src.tar.xz >> $GITHUB_ENV
 
     # upload release archive
     - uses: softprops/action-gh-release@v1
