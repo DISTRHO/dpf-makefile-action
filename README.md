@@ -81,6 +81,7 @@ The table below contains all possible properties for use with `distrho/dpf-makef
 | Property | Required? | Description                                                |
 | -------- | --------- | ---------------------------------------------------------- |
 | target   | Yes       | The target platform and architecture to build for          |
+| debug    | No        | Whether to build in debug mode, defaults to no             |
 | lto      | No        | Whether to enable Link-Time-Optimizations, defaults to no  |
 | dpf_path | No        | Where DPF is located within your repo, defaults to "./dpf" |
 | faust    | No        | Whether to install `faust`                                 |

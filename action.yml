@@ -7,6 +7,10 @@ inputs:
     description: 'Target OS'
     required: true
     default: 'linux'
+  debug:
+    description: 'Build in debug mode'
+    required: false
+    default: false
   lto:
     description: 'Enable Link-Time-Optimizations'
     required: false
@@ -81,6 +85,10 @@ runs:
       run: |
         # lto for regular build
         echo "WITH_LTO=${{ inputs.lto }}" >> $GITHUB_ENV
+        # pawpaw debug
+        PAWPAW_DEBUG=0
+        [[ "${{ inputs.debug }}" = "true" ]] && PAWPAW_DEBUG=1
+        echo "PAWPAW_DEBUG=${PAWPAW_DEBUG}" >> $GITHUB_ENV
         # pawpaw lto
         PAWPAW_SKIP_LTO=1
         [[ "${{ inputs.lto }}" = "true" ]] && PAWPAW_SKIP_LTO=0
@@ -235,7 +243,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' -j $(nproc)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' -j $(nproc)
     - name: Build linux armhf cross-compiled
       if: ${{ inputs.target == 'linux-armhf' }}
       shell: bash
@@ -247,7 +255,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' -j $(nproc)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' -j $(nproc)
     - name: Build linux i686
       if: ${{ inputs.target == 'linux-i386' || inputs.target == 'linux-i686' }}
       shell: bash
@@ -261,7 +269,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' -j $(nproc)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' -j $(nproc)
     - name: Build linux riscv64 cross-compiled
       if: ${{ inputs.target == 'linux-riscv64' }}
       shell: bash
@@ -273,7 +281,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' -j $(nproc)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' -j $(nproc)
     - name: Build linux x86_64
       if: ${{ inputs.target == 'linux-x86_64' || inputs.target == 'linux' }}
       shell: bash
@@ -282,7 +290,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' -j $(nproc)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' -j $(nproc)
     - name: Build macOS intel
       if: ${{ inputs.target == 'macos-intel' }}
       shell: bash
@@ -293,7 +301,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' -j $(sysctl -n hw.logicalcpu)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' -j $(sysctl -n hw.logicalcpu)
         ${{ inputs.dpf_path }}/utils/package-osx-bundles.sh
     - name: Build macOS universal
       if: ${{ inputs.target == 'macos' || inputs.target == 'macos-universal' }}
@@ -305,7 +313,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' NOOPT=true -j $(sysctl -n hw.logicalcpu)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' NOOPT=true -j $(sysctl -n hw.logicalcpu)
         ${{ inputs.dpf_path }}/utils/package-osx-bundles.sh
     - name: Build macOS universal (10.15)
       if: ${{ inputs.target == 'macos-10.15' || inputs.target == 'macos-universal-10.15' }}
@@ -317,7 +325,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' NOOPT=true -j $(sysctl -n hw.logicalcpu)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' NOOPT=true -j $(sysctl -n hw.logicalcpu)
         ${{ inputs.dpf_path }}/utils/package-osx-bundles.sh
     - name: Build win32 cross-compiled
       if: ${{ inputs.target == 'win32' }}
@@ -331,7 +339,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' -j $(nproc)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' -j $(nproc)
     - name: Build win64 cross-compiled
       if: ${{ inputs.target == 'win64' }}
       shell: bash
@@ -344,7 +352,7 @@ runs:
       run: |
         ${{ inputs.pawpaw == 'true' }} && pushd PawPaw && source local.env ${{ env.PAWPAW_TARGET }} && popd
         make HAVE_CAIRO='${{ inputs.pawpaw }}' features
-        make HAVE_CAIRO='${{ inputs.pawpaw }}' -j $(nproc)
+        make HAVE_CAIRO='${{ inputs.pawpaw }}' DEBUG='${{ inputs.debug }}' -j $(nproc)
     - name: Build plugins
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
       shell: bash
@@ -474,7 +482,8 @@ runs:
     - name: Set basenames
       shell: bash
       run: |
-        echo "ARTIFACT_BASENAME=${{ github.event.repository.name }}-${{ inputs.target }}-${{ github.event.pull_request.number || env.SHA8 }}" >> $GITHUB_ENV
+        [[ "${{ inputs.debug }}" = "true" ]] && TARGET_SUFFIX="-debug"
+        echo "ARTIFACT_BASENAME=${{ github.event.repository.name }}-${{ inputs.target }}${TARGET_SUFFIX}-${{ github.event.pull_request.number || env.SHA8 }}" >> $GITHUB_ENV
         echo "RELEASE_BASENAME=${{ github.event.repository.name }}-$(echo ${{ github.ref_name }} | sed 's|/|-|g')" >> $GITHUB_ENV
 
     # create release archive (macOS exception)
@@ -518,7 +527,7 @@ runs:
 
     # create release archive
     - name: Create release archive (Linux)
-      if: ${{ startsWith(inputs.target, 'linux') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' }}
+      if: ${{ startsWith(inputs.target, 'linux') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
       shell: bash
       run: |
         tar chJf ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.tar.xz \
@@ -526,7 +535,7 @@ runs:
             bin/*
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.tar.xz >> $GITHUB_ENV
     - name: Create release archive (macOS)
-      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' }}
+      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
       shell: bash
       run: |
         if [ -e ${{ env.ARTIFACT_BASENAME }}.dmg ]; then
@@ -537,7 +546,7 @@ runs:
           echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg >> $GITHUB_ENV
         fi
     - name: Create release archive (Windows)
-      if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' }}
+      if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
       shell: bash
       run: |
         mv bin ${{ env.RELEASE_BASENAME }}
@@ -561,7 +570,7 @@ runs:
 
     # upload release archive
     - uses: softprops/action-gh-release@v1
-      if: ${{ startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' }}
+      if: ${{ startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
       with:
         tag_name: ${{ github.ref_name }}
         name: ${{ github.ref_name }}
