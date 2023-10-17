@@ -195,7 +195,7 @@ runs:
         # build-deps
         sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
         # runtime testing
-        sudo apt-get install -yqq carla-git lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
+        sudo apt-get install -yqq carla-git ladspa-sdk lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
         # cleanup
         sudo apt-get clean
 
@@ -404,6 +404,13 @@ runs:
                   --keep-debuginfo=yes \
                   --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
                   /usr/lib/carla/carla-bridge-native ladspa ./bin/${p} "" 1>/dev/null; \
+              valgrind \
+                  --error-exitcode=255 \
+                  --leak-check=full \
+                  --track-origins=yes \
+                  --keep-debuginfo=yes \
+                  --suppressions=${{ inputs.dpf_path }}/utils/valgrind-dpf.supp \
+                  /usr/bin/analyseplugin ./bin/${p}; \
           done
     - name: Test DSSI plugins
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
