@@ -78,15 +78,16 @@ jobs:
 
 The table below contains all possible properties for use with `distrho/dpf-makefile-action@v1` action.
 
-| Property | Required? | Description                                                |
-| -------- | --------- | ---------------------------------------------------------- |
-| target   | Yes       | The target platform and architecture to build for          |
-| debug    | No        | Whether to build in debug mode, defaults to no             |
-| lto      | No        | Whether to enable Link-Time-Optimizations, defaults to no  |
-| dpf_path | No        | Where DPF is located within your repo, defaults to "./dpf" |
-| faust    | No        | Whether to install `faust`                                 |
-| pawpaw   | No        | Whether to use [PawPaw](https://github.com/DISTRHO/PawPaw/) to install and setup extra libraries, defaults to no |
-| release  | No        | Whether to automatically upload releases, defaults to yes  |
+| Property  | Required? | Description                                                |
+| --------- | --------- | ---------------------------------------------------------- |
+| target    | Yes       | The target platform and architecture to build for          |
+| debug     | No        | Whether to build in debug mode, defaults to no             |
+| lto       | No        | Whether to enable Link-Time-Optimizations, defaults to no  |
+| dpf_path  | No        | Where DPF is located within your repo, defaults to "./dpf" |
+| extraargs | No        | Extra arguments to pass into `make`                        |
+| faust     | No        | Whether to install `faust`                                 |
+| pawpaw    | No        | Whether to use [PawPaw](https://github.com/DISTRHO/PawPaw/) to install and setup extra libraries, defaults to no |
+| release   | No        | Whether to automatically upload releases, defaults to yes  |
 
 The table below contains all possible targets and supported runners.
 
