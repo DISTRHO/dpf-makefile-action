@@ -235,6 +235,7 @@ runs:
       run: |
         git clone https://github.com/DISTRHO/PawPaw.git
         git -C PawPaw checkout ${{ env.PAWPAW_COMMIT_HASH }}
+        ./PawPaw/.github/workflows/bootstrap-deps.sh ${{ inputs.target }}
         ./PawPaw/bootstrap-plugins.sh ${{ env.PAWPAW_TARGET }}
         ./PawPaw/.cleanup.sh ${{ env.PAWPAW_TARGET }}
 
