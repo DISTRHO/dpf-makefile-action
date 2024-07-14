@@ -35,6 +35,10 @@ inputs:
     description: 'Automatically upload releases'
     required: false
     default: true
+  suffix:
+    description: 'Artifact and release filename suffix'
+    required: false
+    default: ''
 
 outputs:
   release_filename:
@@ -504,8 +508,8 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.debug }}" = "true" ]] && TARGET_SUFFIX="-debug"
-        echo "ARTIFACT_BASENAME=${{ github.event.repository.name }}-${{ inputs.target }}${TARGET_SUFFIX}-${{ github.event.pull_request.number || env.SHA8 }}" >> $GITHUB_ENV
-        echo "RELEASE_BASENAME=${{ github.event.repository.name }}-$(echo ${{ github.ref_name }} | sed 's|/|-|g')" >> $GITHUB_ENV
+        echo "ARTIFACT_BASENAME=${{ github.event.repository.name }}-${{ inputs.target }}${TARGET_SUFFIX}-${{ github.event.pull_request.number || env.SHA8 }}${{ inputs.suffix }}" >> $GITHUB_ENV
+        echo "RELEASE_BASENAME=${{ github.event.repository.name }}-$(echo ${{ github.ref_name }} | sed 's|/|-|g')${{ inputs.suffix }}" >> $GITHUB_ENV
 
     # create release archive (macOS exception)
     - name: Create release archive (macOS non-release)

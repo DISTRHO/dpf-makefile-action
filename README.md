@@ -88,6 +88,7 @@ The table below contains all possible properties for use with `distrho/dpf-makef
 | faust     | No        | Whether to install `faust`                                 |
 | pawpaw    | No        | Whether to use [PawPaw](https://github.com/DISTRHO/PawPaw/) to install and setup extra libraries, defaults to no |
 | release   | No        | Whether to automatically upload releases, defaults to yes  |
+| suffix    | No        | Artifact and release filename suffix                       |
 
 The table below contains all possible targets and supported runners.
 
