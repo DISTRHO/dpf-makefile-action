@@ -92,22 +92,23 @@ The table below contains all possible properties for use with `distrho/dpf-makef
 
 The table below contains all possible targets and supported runners.
 
-| Target          | Aliases               | Allowed runners            |
-| --------------- | --------------------- | -------------------------- |
-| linux-arm64     |                       | ubuntu-20.04, ubuntu-22.04 |
-| linux-armhf     |                       | ubuntu-20.04, ubuntu-22.04 |
-| linux-i686      | linux-i386            | ubuntu-20.04, ubuntu-22.04 |
-| linux-riscv64   |                       | ubuntu-20.04, ubuntu-22.04 |
-| linux-x86_64    | linux                 | ubuntu-20.04, ubuntu-22.04 |
-| macos-intel     |                       | macos-*                    |
-| macos-universal | macos                 | macos-*                    |
-| macos-10.15     | macos-universal-10.15 | macos-*                    |
-| win32           |                       | ubuntu-20.04, ubuntu-22.04 |
-| win64           |                       | ubuntu-20.04, ubuntu-22.04 |
-| pluginval       | plugin-validation     | ubuntu-20.04, ubuntu-22.04 |
-| source          |                       | ubuntu-20.04, ubuntu-22.04 |
+| Target          | Aliases               | Allowed runners          |
+| --------------- | --------------------- | ------------------------ |
+| linux-arm64     |                       | ubuntu-20.04,22.04,24.04 |
+| linux-armhf     |                       | ubuntu-20.04,22.04,24.04 |
+| linux-i686      | linux-i386            | ubuntu-20.04,22.04,24.04 |
+| linux-riscv64   |                       | ubuntu-20.04,22.04,24.04 |
+| linux-x86_64    | linux                 | ubuntu-20.04,22.04,24.04 |
+| macos-intel     |                       | macos-12,13,14           |
+| macos-universal | macos                 | macos-12,13,14           |
+| macos-10.15     | macos-universal-10.15 | macos-12,13,14           |
+| win32           |                       | ubuntu-20.04,22.04,24.04 |
+| win64           |                       | ubuntu-20.04,22.04,24.04 |
+| pluginval       | plugin-validation     | ubuntu-20.04,22.04,24.04 |
+| source          |                       | ubuntu-20.04,22.04,24.04 |
 
 Notes:
+ - ubuntu-24.04 runner has [broken 32bit support](https://bugs.launchpad.net/ubuntu/+source/linux-signed-azure/+bug/2071445), which breaks wine and i686 builds
  - macos-intel uses 10.8 as minimum version
  - macos-universal uses 10.12 as minimum version
  - Windows builds use Ubuntu runners in cross-compilation instead of Windows ones
