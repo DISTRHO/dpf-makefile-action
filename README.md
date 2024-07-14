@@ -20,7 +20,7 @@ jobs:
         target: [linux-arm64, linux-armhf, linux-i686, linux-riscv64, linux-x86_64]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - uses: distrho/dpf-makefile-action@v1
@@ -33,7 +33,7 @@ jobs:
         target: [macos-intel, macos-universal]
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - uses: distrho/dpf-makefile-action@v1
@@ -46,7 +46,7 @@ jobs:
         target: [win32, win64]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - uses: distrho/dpf-makefile-action@v1
@@ -56,7 +56,7 @@ jobs:
   pluginval:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - uses: distrho/dpf-makefile-action@v1
@@ -66,7 +66,7 @@ jobs:
   source:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - uses: distrho/dpf-makefile-action@v1
@@ -98,9 +98,9 @@ The table below contains all possible targets and supported runners.
 | linux-i686      | linux-i386            | ubuntu-20.04, ubuntu-22.04 |
 | linux-riscv64   |                       | ubuntu-20.04, ubuntu-22.04 |
 | linux-x86_64    | linux                 | ubuntu-20.04, ubuntu-22.04 |
-| macos-intel     |                       | macos-11, macos-12         |
-| macos-universal | macos                 | macos-11, macos-12         |
-| macos-10.15     | macos-universal-10.15 | macos-11, macos-12         |
+| macos-intel     |                       | macos-*                    |
+| macos-universal | macos                 | macos-*                    |
+| macos-10.15     | macos-universal-10.15 | macos-*                    |
 | win32           |                       | ubuntu-20.04, ubuntu-22.04 |
 | win64           |                       | ubuntu-20.04, ubuntu-22.04 |
 | pluginval       | plugin-validation     | ubuntu-20.04, ubuntu-22.04 |
