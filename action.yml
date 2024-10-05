@@ -58,8 +58,8 @@ runs:
         echo "HOMEBREW_NO_AUTO_UPDATE=1" >> $GITHUB_ENV
         echo "HOMEBREW_NO_INSTALL_CLEANUP=1" >> $GITHUB_ENV
         echo "LIBGL_ALWAYS_SOFTWARE=true" >> $GITHUB_ENV
-        echo "PAWPAW_CACHE_VERSION=${PAWPAW_CACHE_VERSION:=8}" >> $GITHUB_ENV
-        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=526b9cc210e8d7394f6b46ceeed776561520cef2}" >> $GITHUB_ENV
+        echo "PAWPAW_CACHE_VERSION=${PAWPAW_CACHE_VERSION:=1}" >> $GITHUB_ENV
+        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=f9b573a83aff3f919557e791acfe6ac507a3fd3b}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_GLIB=${PAWPAW_SKIP_GLIB:=1}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_LV2=${PAWPAW_SKIP_LV2:=1}" >> $GITHUB_ENV
         [ "$(id -u)" -ne 0 ] && [ -e /usr/bin/sudo ] && echo "SUDO=/usr/bin/sudo" >> $GITHUB_ENV
