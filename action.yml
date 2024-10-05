@@ -59,43 +59,45 @@ runs:
         echo "HOMEBREW_NO_INSTALL_CLEANUP=1" >> $GITHUB_ENV
         echo "LIBGL_ALWAYS_SOFTWARE=true" >> $GITHUB_ENV
         echo "PAWPAW_CACHE_VERSION=${PAWPAW_CACHE_VERSION:=8}" >> $GITHUB_ENV
-        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=80607a764da0b5a6b2daa4d5dd165beafa0535bc}" >> $GITHUB_ENV
+        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=526b9cc210e8d7394f6b46ceeed776561520cef2}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_GLIB=${PAWPAW_SKIP_GLIB:=1}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_LV2=${PAWPAW_SKIP_LV2:=1}" >> $GITHUB_ENV
+        [ "$(id -u)" -ne 0 ] && [ -e /usr/bin/sudo ] && echo "SUDO=/usr/bin/sudo" >> $GITHUB_ENV
     - name: Fix GitHub's mess (detect version)
       if: ${{ runner.os == 'Linux' }}
       shell: bash
       run: |
+        [ ! -e /usr/bin/lsb_release ] && ${SUDO} apt-get update -qq && ${SUDO} apt-get install -yqq lsb-release
         echo "UBUNTU_CODENAME=$(lsb_release -sc)" >> $GITHUB_ENV
         echo "UBUNTU_VERSION=$(lsb_release -sr)" >> $GITHUB_ENV
     - name: Fix GitHub's mess (ubuntu-20.04)
       if: ${{ runner.os == 'Linux' && env.UBUNTU_VERSION == '20.04' }}
       shell: bash
       run: |
-        sudo rm /etc/apt/sources.list.d/*.list
-        sudo apt-get update -qq
-        sudo apt-get purge -yqq git-man libclang* libgbm* libllvm* libmono* libnginx* moby* mono* nginx* perl php* libgdiplus libpcre2-posix3 libselinux1-dev libzip4
-        sudo apt-get install -yqq --allow-downgrades autoconf/focal automake/focal build-essential/focal git/focal libgd3/focal libglib2.0-0/focal libglib2.0-dev/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal pkg-config/focal
-        sudo apt-get clean
+        ${SUDO} rm /etc/apt/sources.list.d/*.list
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get purge -yqq git-man libclang* libgbm* libllvm* libmono* libnginx* moby* mono* nginx* perl php* libgdiplus libpcre2-posix3 libselinux1-dev libzip4
+        ${SUDO} apt-get install -yqq --allow-downgrades autoconf/focal automake/focal build-essential/focal git/focal libgd3/focal libglib2.0-0/focal libglib2.0-dev/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal pkg-config/focal
+        ${SUDO} apt-get clean
     - name: Fix GitHub's mess (ubuntu-22.04)
       if: ${{ runner.os == 'Linux' && env.UBUNTU_VERSION == '22.04' }}
       shell: bash
       run: |
-        sudo rm /etc/apt/sources.list.d/*.list
-        sudo apt-get update -qq
-        sudo apt-get purge -yqq git-man libclang* libgbm* libllvm* libmono* libnginx* moby* mono* msbuild* nginx* perl php* libgdiplus libpcre2-posix3 libselinux1-dev libzip4
-        sudo apt-get install -y --allow-downgrades git/jammy libatomic1/jammy libc6/jammy libgcc-s1/jammy libglvnd0/jammy libstdc++6/jammy
-        sudo apt-get clean
+        ${SUDO} rm /etc/apt/sources.list.d/*.list
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get purge -yqq git-man libclang* libgbm* libllvm* libmono* libnginx* moby* mono* msbuild* nginx* perl php* libgdiplus libpcre2-posix3 libselinux1-dev libzip4
+        ${SUDO} apt-get install -y --allow-downgrades git/jammy libatomic1/jammy libc6/jammy libgcc-s1/jammy libglvnd0/jammy libstdc++6/jammy
+        ${SUDO} apt-get clean
     - name: Fix GitHub's mess (ubuntu-24.04)
       if: ${{ runner.os == 'Linux' && env.UBUNTU_VERSION == '24.04' }}
       shell: bash
       run: |
-        sudo rm /etc/apt/sources.list.d/azure-cli.sources /etc/apt/sources.list.d/microsoft-prod.list
-        sudo sed -i 's|Types: deb|Types: deb\nArchitectures: amd64 i386|g' /etc/apt/sources.list.d/ubuntu.sources
-        sudo apt-get update -qq
-        sudo apt-get purge -yqq git-man libclang* libgbm* libllvm* libmono* libnginx* moby* mono* nginx* perl php* libgdiplus libpcre2-posix3 libselinux1-dev libzip4
-        sudo apt-get install -y --allow-downgrades libatomic1/noble libc6/noble libgcc-s1/noble libstdc++6/noble
-        sudo apt-get clean
+        ${SUDO} rm /etc/apt/sources.list.d/azure-cli.sources /etc/apt/sources.list.d/microsoft-prod.list
+        ${SUDO} sed -i 's|Types: deb|Types: deb\nArchitectures: amd64 i386|g' /etc/apt/sources.list.d/ubuntu.sources
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get purge -yqq git-man libclang* libgbm* libllvm* libmono* libnginx* moby* mono* nginx* perl php* libgdiplus libpcre2-posix3 libselinux1-dev libzip4
+        ${SUDO} apt-get install -y --allow-downgrades libatomic1/noble libc6/noble libgcc-s1/noble libstdc++6/noble
+        ${SUDO} apt-get clean
 
     # setup build options
     - name: Setup build options
@@ -131,56 +133,56 @@ runs:
       if: ${{ inputs.target == 'linux-arm64' }}
       shell: bash
       run: |
-        sudo dpkg --add-architecture arm64
-        sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-        sudo sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
-        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }} main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-arm64.list
-        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
-        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-arm64.list
-        sudo apt-get update -qq
-        sudo apt-get install -yqq --allow-downgrades g++-aarch64-linux-gnu libasound2-dev:arm64 libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 liblo-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 gperf qemu-user-static
-        sudo apt-get clean
+        ${SUDO} dpkg --add-architecture arm64
+        ${SUDO} sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
+        ${SUDO} sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }} main restricted universe multiverse" | ${SUDO} tee /etc/apt/sources.list.d/ports-arm64.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-updates main restricted universe multiverse" | ${SUDO} tee -a /etc/apt/sources.list.d/ports-arm64.list
+        echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-backports main restricted universe multiverse" | ${SUDO} tee -a /etc/apt/sources.list.d/ports-arm64.list
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get install -yqq --allow-downgrades g++-aarch64-linux-gnu libasound2-dev:arm64 libdbus-1-dev:arm64 libgl1-mesa-dev:arm64 libglib2.0-dev:arm64 liblo-dev:arm64 libx11-dev:arm64 libxcursor-dev:arm64 libxext-dev:arm64 libxrandr-dev:arm64 gperf qemu-user-static
+        ${SUDO} apt-get clean
     - name: Setup dependencies (linux-armhf)
       if: ${{ inputs.target == 'linux-armhf' }}
       shell: bash
       run: |
-        sudo dpkg --add-architecture armhf
-        sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-        sudo sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
-        echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }} main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-armhf.list
-        echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
-        echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-armhf.list
-        sudo apt-get update -qq
-        sudo apt-get install -yqq --allow-downgrades g++-arm-linux-gnueabihf libasound2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf liblo-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf gperf qemu-user-static
-        sudo apt-get clean
+        ${SUDO} dpkg --add-architecture armhf
+        ${SUDO} sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
+        ${SUDO} sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
+        echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }} main restricted universe multiverse" | ${SUDO} tee /etc/apt/sources.list.d/ports-armhf.list
+        echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-updates main restricted universe multiverse" | ${SUDO} tee -a /etc/apt/sources.list.d/ports-armhf.list
+        echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-backports main restricted universe multiverse" | ${SUDO} tee -a /etc/apt/sources.list.d/ports-armhf.list
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get install -yqq --allow-downgrades g++-arm-linux-gnueabihf libasound2-dev:armhf libdbus-1-dev:armhf libgl1-mesa-dev:armhf libglib2.0-dev:armhf liblo-dev:armhf libx11-dev:armhf libxcursor-dev:armhf libxext-dev:armhf libxrandr-dev:armhf gperf qemu-user-static
+        ${SUDO} apt-get clean
     - name: Setup dependencies (linux-i686)
       if: ${{ inputs.target == 'linux-i386' || inputs.target == 'linux-i686' }}
       shell: bash
       run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update -qq
-        sudo apt-get install -yqq --allow-downgrades g++-i686-linux-gnu libasound2-dev:i386 libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 liblo-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386 gperf
-        sudo apt-get clean
+        ${SUDO} dpkg --add-architecture i386
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get install -yqq --allow-downgrades g++-i686-linux-gnu libasound2-dev:i386 libdbus-1-dev:i386 libgl1-mesa-dev:i386 libglib2.0-dev:i386 liblo-dev:i386 libx11-dev:i386 libxcursor-dev:i386 libxext-dev:i386 libxrandr-dev:i386 gperf
+        ${SUDO} apt-get clean
     - name: Setup dependencies (linux-riscv64)
       if: ${{ inputs.target == 'linux-riscv64' }}
       shell: bash
       run: |
-        sudo dpkg --add-architecture riscv64
-        sudo sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
-        sudo sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
-        echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }} main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/ports-riscv64.list
-        echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
-        echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ports-riscv64.list
-        sudo apt-get update -qq
-        sudo apt-get install -yqq --allow-downgrades g++-riscv64-linux-gnu libasound2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglib2.0-dev:riscv64 liblo-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 gperf qemu-user-static
-        sudo apt-get clean
+        ${SUDO} dpkg --add-architecture riscv64
+        ${SUDO} sed -i "s/deb http/deb [arch=amd64] http/" /etc/apt/sources.list
+        ${SUDO} sed -i "s/deb mirror/deb [arch=amd64] mirror/" /etc/apt/sources.list
+        echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }} main restricted universe multiverse" | ${SUDO} tee /etc/apt/sources.list.d/ports-riscv64.list
+        echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-updates main restricted universe multiverse" | ${SUDO} tee -a /etc/apt/sources.list.d/ports-riscv64.list
+        echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-backports main restricted universe multiverse" | ${SUDO} tee -a /etc/apt/sources.list.d/ports-riscv64.list
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get install -yqq --allow-downgrades g++-riscv64-linux-gnu libasound2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglib2.0-dev:riscv64 liblo-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 gperf qemu-user-static
+        ${SUDO} apt-get clean
     - name: Setup dependencies (linux-x86_64)
       if: ${{ inputs.target == 'linux-x86_64' || inputs.target == 'linux' }}
       shell: bash
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
-        sudo apt-get clean
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev liblo-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
+        ${SUDO} apt-get clean
     - name: Setup dependencies (macOS)
       if: ${{ startsWith(inputs.target, 'macos') }}
       shell: bash
@@ -190,32 +192,32 @@ runs:
       if: ${{ inputs.target == 'win32' }}
       shell: bash
       run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update -qq
-        sudo apt-get install -yqq --allow-downgrades binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 gperf wine-stable:i386 xvfb
-        sudo apt-get clean
+        ${SUDO} dpkg --add-architecture i386
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get install -yqq --allow-downgrades binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 gperf wine-stable:i386 xvfb
+        ${SUDO} apt-get clean
     - name: Setup dependencies (win64)
       if: ${{ inputs.target == 'win64' }}
       shell: bash
       run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update -qq
-        sudo apt-get install -yqq --allow-downgrades binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 gperf wine-stable xvfb
-        sudo apt-get clean
+        ${SUDO} dpkg --add-architecture i386
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get install -yqq --allow-downgrades binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 gperf wine-stable xvfb
+        ${SUDO} apt-get clean
     - name: Setup dependencies (pluginval)
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
       shell: bash
       run: |
         # custom repos
         wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_11.1.0_all.deb
-        sudo dpkg -i kxstudio-repos_11.1.0_all.deb
-        sudo apt-get update -qq
+        ${SUDO} dpkg -i kxstudio-repos_11.1.0_all.deb
+        ${SUDO} apt-get update -qq
         # build-deps
-        sudo apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
+        ${SUDO} apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
         # runtime testing
-        sudo apt-get install -yqq carla-git ladspa-sdk lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
+        ${SUDO} apt-get install -yqq carla-git ladspa-sdk lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
         # cleanup
-        sudo apt-get clean
+        ${SUDO} apt-get clean
 
     # install faust (optional)
     - name: Cache faust debs
@@ -228,14 +230,14 @@ runs:
       if: ${{ inputs.faust == 'true' && runner.os == 'Linux' }}
       shell: bash
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -yqq libllvm10 libmicrohttpd12 libsndfile1
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get install -yqq libllvm10 libmicrohttpd12 libsndfile1
         mkdir -p ~/faustdebs
         wget -c -P ~/faustdebs \
           https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/faust_2.41.1~ds0-0_amd64.deb \
           https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/faust-common_2.41.1~ds0-0_all.deb \
           https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/libfaust2_2.41.1~ds0-0_amd64.deb
-        sudo dpkg -i ~/faustdebs/*.deb
+        ${SUDO} dpkg -i ~/faustdebs/*.deb
     - name: Install faust (macOS)
       if: ${{ inputs.faust == 'true' && startsWith(inputs.target, 'macos') }}
       shell: bash
@@ -249,13 +251,9 @@ runs:
       run: |
         git clone https://github.com/DISTRHO/PawPaw.git
         git -C PawPaw checkout ${{ env.PAWPAW_COMMIT_HASH }}
-        echo t1
         ./PawPaw/.github/workflows/bootstrap-deps.sh ${{ env.PAWPAW_TARGET }}
-        echo t2
         ./PawPaw/bootstrap-plugins.sh ${{ env.PAWPAW_TARGET }}
-        echo t3
         ./PawPaw/.cleanup.sh ${{ env.PAWPAW_TARGET }}
-        echo t4
 
     # build plugins
     - name: Build linux arm64 cross-compiled
