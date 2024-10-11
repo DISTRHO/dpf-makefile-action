@@ -27,6 +27,10 @@ inputs:
     description: 'Install faust'
     required: false
     default: false
+  hvcc:
+    description: 'Install hvcc'
+    required: false
+    default: false
   pawpaw:
     description: 'Install and setup extra libraries'
     required: false
@@ -57,6 +61,7 @@ runs:
         echo "DEBIAN_FRONTEND=noninteractive" >> $GITHUB_ENV
         echo "HOMEBREW_NO_AUTO_UPDATE=1" >> $GITHUB_ENV
         echo "HOMEBREW_NO_INSTALL_CLEANUP=1" >> $GITHUB_ENV
+        echo "HVCC_COMMIT_HASH=${HVCC_COMMIT_HASH:=44708e75e2f7ddfcf4b6629b3693bcb6e0bd5358}" >> $GITHUB_ENV
         echo "LIBGL_ALWAYS_SOFTWARE=true" >> $GITHUB_ENV
         echo "PAWPAW_CACHE_VERSION=${PAWPAW_CACHE_VERSION:=1}" >> $GITHUB_ENV
         echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=f9b573a83aff3f919557e791acfe6ac507a3fd3b}" >> $GITHUB_ENV
@@ -243,6 +248,14 @@ runs:
       shell: bash
       run: |
         brew install faust
+
+    # install hvcc (optional)
+    - name: Install hvcc
+      if: ${{ inputs.hvcc == 'true' }}
+      shell: bash
+      run: |
+        python3 -m pip install --no-input \
+            git+https://github.com/Wasted-Audio/hvcc.git#${{ env.HVCC_COMMIT_HASH }}
 
     # build dependencies
     - name: Build dependencies through PawPaw

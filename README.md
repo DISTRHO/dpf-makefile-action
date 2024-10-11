@@ -86,6 +86,7 @@ The table below contains all possible properties for use with `distrho/dpf-makef
 | dpf_path  | No        | Where DPF is located within your repo, defaults to "./dpf" |
 | extraargs | No        | Extra arguments to pass into `make`                        |
 | faust     | No        | Whether to install `faust`                                 |
+| hvcc      | No        | Whether to install `hvcc`                                  |
 | pawpaw    | No        | Whether to use [PawPaw](https://github.com/DISTRHO/PawPaw/) to install and setup extra libraries, defaults to no |
 | release   | No        | Whether to automatically upload releases, defaults to yes  |
 | suffix    | No        | Artifact and release filename suffix                       |
