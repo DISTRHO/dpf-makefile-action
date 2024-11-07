@@ -31,7 +31,7 @@ jobs:
     strategy:
       matrix:
         target: [macos-intel, macos-universal]
-    runs-on: macos-11
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
         with:
@@ -100,9 +100,9 @@ The table below contains all possible targets and supported runners.
 | linux-i686      | linux-i386            | ubuntu-20.04,22.04,24.04 |
 | linux-riscv64   |                       | ubuntu-20.04,22.04,24.04 |
 | linux-x86_64    | linux                 | ubuntu-20.04,22.04,24.04 |
-| macos-intel     |                       | macos-12,13,14           |
-| macos-universal | macos                 | macos-12,13,14           |
-| macos-10.15     | macos-universal-10.15 | macos-12,13,14           |
+| macos-intel     |                       | macos-13,14           |
+| macos-universal | macos                 | macos-13,14           |
+| macos-10.15     | macos-universal-10.15 | macos-13,14           |
 | win32           |                       | ubuntu-20.04,22.04,24.04 |
 | win64           |                       | ubuntu-20.04,22.04,24.04 |
 | pluginval       | plugin-validation     | ubuntu-20.04,22.04,24.04 |
