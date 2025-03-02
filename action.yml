@@ -529,8 +529,8 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.debug }}" = "true" ]] && TARGET_SUFFIX="-debug"
-        echo "ARTIFACT_BASENAME=${{ github.event.repository.name }}-${{ inputs.target }}${TARGET_SUFFIX}-${{ github.event.pull_request.number || env.SHA8 }}${{ inputs.suffix }}" >> $GITHUB_ENV
-        echo "RELEASE_BASENAME=${{ github.event.repository.name }}-$(echo ${{ github.ref_name }} | sed 's|/|-|g')${{ inputs.suffix }}" >> $GITHUB_ENV
+        echo "ARTIFACT_BASENAME=${{ env.NAME || github.event.repository.name }}-${{ inputs.target }}${TARGET_SUFFIX}-${{ github.event.pull_request.number || env.SHA8 }}${{ inputs.suffix }}" >> $GITHUB_ENV
+        echo "RELEASE_BASENAME=${{ env.NAME || github.event.repository.name }}-$(echo ${{ github.ref_name }} | sed 's|/|-|g')${{ inputs.suffix }}" >> $GITHUB_ENV
 
     # create release archive (macOS exception)
     - name: Create release archive (macOS non-release)
@@ -540,7 +540,7 @@ runs:
         if [ "$(ls bin | grep '.app$' | wc -l)" -ge 1 ]; then
           mkdir macos-pkg
           mv bin/*.app macos-pkg/
-          mv *-macOS.pkg macos-pkg/${{ github.event.repository.name }}-AudioPlugins.pkg
+          mv *-macOS.pkg macos-pkg/${{ env.NAME || github.event.repository.name }}-AudioPlugins.pkg
           hdiutil create ${{ env.ARTIFACT_BASENAME }}.dmg -srcfolder macos-pkg -volname ${{ env.ARTIFACT_BASENAME }} -fs HFS+ -ov
         else
           cp *-macOS.pkg ${{ env.ARTIFACT_BASENAME }}.pkg
