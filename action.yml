@@ -277,6 +277,7 @@ runs:
       env:
         CC: aarch64-linux-gnu-gcc
         CXX: aarch64-linux-gnu-g++
+        EXE_WRAPPER: qemu-aarch64-static
         LDFLAGS: -static-libgcc -static-libstdc++
         PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
       run: |
@@ -289,6 +290,7 @@ runs:
       env:
         CC: arm-linux-gnueabihf-gcc
         CXX: arm-linux-gnueabihf-g++
+        EXE_WRAPPER: qemu-arm-static
         LDFLAGS: -static-libgcc -static-libstdc++
         PKG_CONFIG_PATH: /usr/lib/arm-linux-gnueabihf/pkgconfig
       run: |
@@ -315,6 +317,7 @@ runs:
       env:
         CC: riscv64-linux-gnu-gcc
         CXX: riscv64-linux-gnu-g++
+        EXE_WRAPPER: qemu-riscv64-static
         LDFLAGS: -static-libgcc -static-libstdc++
         PKG_CONFIG_PATH: /usr/lib/riscv64-linux-gnu/pkgconfig
       run: |
