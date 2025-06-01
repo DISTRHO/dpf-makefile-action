@@ -64,7 +64,7 @@ runs:
         echo "HVCC_COMMIT_HASH=${HVCC_COMMIT_HASH:=44708e75e2f7ddfcf4b6629b3693bcb6e0bd5358}" >> $GITHUB_ENV
         echo "LIBGL_ALWAYS_SOFTWARE=true" >> $GITHUB_ENV
         echo "PAWPAW_CACHE_VERSION=${PAWPAW_CACHE_VERSION:=1}" >> $GITHUB_ENV
-        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=f9b573a83aff3f919557e791acfe6ac507a3fd3b}" >> $GITHUB_ENV
+        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=21dec126478a334a9ab5cce12489e5d1df62a37f}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_GLIB=${PAWPAW_SKIP_GLIB:=1}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_LV2=${PAWPAW_SKIP_LV2:=1}" >> $GITHUB_ENV
         [ "$(id -u)" -ne 0 ] && [ -e /usr/bin/sudo ] && echo "SUDO=/usr/bin/sudo" >> $GITHUB_ENV || true
