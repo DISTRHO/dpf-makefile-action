@@ -241,6 +241,7 @@ runs:
         mkdir -p ~/faustdebs
         wget -c -P ~/faustdebs \
           http://mirrors.kernel.org/ubuntu/pool/main/l/llvm-toolchain-10/libllvm10_10.0.0-4ubuntu1_amd64.deb \
+          http://mirrors.kernel.org/ubuntu/pool/main/libf/libffi/libffi7_3.3-4_amd64.deb \
           https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/faust_2.41.1~ds0-0_amd64.deb \
           https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/faust-common_2.41.1~ds0-0_all.deb \
           https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/libfaust2_2.41.1~ds0-0_amd64.deb
