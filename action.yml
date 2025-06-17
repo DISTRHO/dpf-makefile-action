@@ -64,7 +64,7 @@ runs:
         echo "HVCC_COMMIT_HASH=${HVCC_COMMIT_HASH:=44708e75e2f7ddfcf4b6629b3693bcb6e0bd5358}" >> $GITHUB_ENV
         echo "LIBGL_ALWAYS_SOFTWARE=true" >> $GITHUB_ENV
         echo "PAWPAW_CACHE_VERSION=${PAWPAW_CACHE_VERSION:=1}" >> $GITHUB_ENV
-        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=21dec126478a334a9ab5cce12489e5d1df62a37f}" >> $GITHUB_ENV
+        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=f6eaed13bdeccec013d81ba2261f98aa8f452702}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_GLIB=${PAWPAW_SKIP_GLIB:=1}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_LV2=${PAWPAW_SKIP_LV2:=1}" >> $GITHUB_ENV
         [ "$(id -u)" -ne 0 ] && [ -e /usr/bin/sudo ] && echo "SUDO=/usr/bin/sudo" >> $GITHUB_ENV || true
@@ -417,6 +417,8 @@ runs:
       shell: bash
       run: |
         lv2_validate \
+            /usr/lib/lv2/dg-meta/*.ttl \
+            /usr/lib/lv2/dg-properties.lv2/*.ttl \
             /usr/lib/lv2/kx-meta/*.ttl \
             /usr/lib/lv2/kx-control-input-port-change-request.lv2/*.ttl \
             /usr/lib/lv2/kx-programs.lv2/*.ttl \
@@ -431,7 +433,7 @@ runs:
         export LV2_PATH=/tmp/lv2-path
         mkdir ${LV2_PATH}
         mv bin/*.lv2 ${LV2_PATH}/
-        cp -r /usr/lib/lv2/{atom,buf-size,core,data-access,kx-control-input-port-change-request,kx-programs,kx-properties,mod,modgui,instance-access,midi,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 ${LV2_PATH}/
+        cp -r /usr/lib/lv2/{atom,buf-size,core,data-access,dg-properties,kx-control-input-port-change-request,kx-programs,kx-properties,mod,modgui,instance-access,midi,parameters,port-groups,port-props,options,patch,presets,resize-port,state,time,ui,units,urid,worker}.lv2 ${LV2_PATH}/
         lv2lint -s lv2_generate_ttl -l ld-linux-x86-64.so.2 -M nopack $(lv2ls)
     - name: Test LADSPA plugins
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
