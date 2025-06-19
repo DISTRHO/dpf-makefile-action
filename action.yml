@@ -221,7 +221,7 @@ runs:
         # build-deps
         ${SUDO} apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
         # runtime testing
-        ${SUDO} apt-get install -yqq carla-git ladspa-sdk lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
+        ${SUDO} apt-get install -yqq carla-git ladspa-sdk lilv-utils lv2-dev lv2lint darkglass-lv2-extensions kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
         # cleanup
         ${SUDO} apt-get clean
 
