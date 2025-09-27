@@ -258,7 +258,7 @@ runs:
       shell: bash
       run: |
         python3 -m pip install --no-input \
-            git+https://github.com/Wasted-Audio/hvcc.git#${{ env.HVCC_COMMIT_HASH }}
+            git+https://github.com/Wasted-Audio/hvcc.git@${{ env.HVCC_COMMIT_HASH }}
 
     # build dependencies
     - name: Build dependencies through PawPaw
