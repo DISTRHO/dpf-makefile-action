@@ -193,7 +193,8 @@ runs:
       if: ${{ startsWith(inputs.target, 'macos') }}
       shell: bash
       run: |
-        brew uninstall --ignore-dependencies -f cairo cmake
+        brew uninstall --ignore-dependencies -f cairo
+        ${{ inputs.pawpaw == 'true' }} && brew uninstall --ignore-dependencies -f cmake || true
     - name: Setup dependencies (win32)
       if: ${{ inputs.target == 'win32' }}
       shell: bash
