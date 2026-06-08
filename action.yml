@@ -63,6 +63,7 @@ runs:
         echo "HOMEBREW_NO_INSTALL_CLEANUP=1" >> $GITHUB_ENV
         echo "HVCC_COMMIT_HASH=${HVCC_COMMIT_HASH:=44708e75e2f7ddfcf4b6629b3693bcb6e0bd5358}" >> $GITHUB_ENV
         echo "LIBGL_ALWAYS_SOFTWARE=true" >> $GITHUB_ENV
+        echo "PATH=~/.local/bin:${PATH}" >> $GITHUB_ENV
         echo "PAWPAW_CACHE_VERSION=${PAWPAW_CACHE_VERSION:=1}" >> $GITHUB_ENV
         echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=ff037e1133f9f0a54579d7dca75f402ea9fec95d}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_GLIB=${PAWPAW_SKIP_GLIB:=1}" >> $GITHUB_ENV
@@ -238,7 +239,7 @@ runs:
       shell: bash
       run: |
         ${SUDO} apt-get update -qq
-        ${SUDO} apt-get install -yqq libmicrohttpd12 liboscpack1 libsndfile1
+        ${SUDO} apt-get install -yqq libedit2 libmicrohttpd12 liboscpack1 libsndfile1 python3-pip python3-venv wget
         mkdir -p ~/faustdebs
         wget -c -P ~/faustdebs \
           http://mirrors.kernel.org/ubuntu/pool/main/l/llvm-toolchain-10/libllvm10_10.0.0-4ubuntu1_amd64.deb \
@@ -248,11 +249,18 @@ runs:
           https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/faust-common_2.85.5+ds0-1_all.deb \
           https://launchpad.net/~kxstudio-debian/+archive/ubuntu/toolchain/+files/faust_2.85.5+ds0-1_amd64.deb
         ${SUDO} dpkg -i ~/faustdebs/*.deb
+        mkdir -p ~/.local/bin ~/.local/share
+        python3 -m venv ~/.local/share/pipx-venv
+        ~/.local/share/pipx-venv/bin/pip install pipx
+        ~/.local/share/pipx-venv/bin/pipx install pipx
+        pipx ensurepath
+        pipx install faustdoctor
     - name: Install faust (macOS)
       if: ${{ inputs.faust == 'true' && startsWith(inputs.target, 'macos') }}
       shell: bash
       run: |
         brew install faust
+        pipx install faustdoctor
 
     # install hvcc (optional)
     - name: Install hvcc
