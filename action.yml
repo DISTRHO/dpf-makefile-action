@@ -181,6 +181,16 @@ runs:
         echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-updates main restricted universe multiverse" | ${SUDO} tee -a /etc/apt/sources.list.d/ports-riscv64.list
         echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports ${{ env.UBUNTU_CODENAME }}-backports main restricted universe multiverse" | ${SUDO} tee -a /etc/apt/sources.list.d/ports-riscv64.list
         ${SUDO} apt-get update -qq
+        # workaround for ncurses riscv64 build failure
+        if [[ "${{ env.UBUNTU_VERSION }}" = "22.04" ]]; then
+            ${SUDO} apt-get purge -yqq libncurses-dev
+            wget \
+                http://kx.studio/tmp/libtinfo6_6.3-2ubuntu0.1_amd64.deb \
+                http://kx.studio/tmp/libncurses6_6.3-2ubuntu0.1_amd64.deb \
+                http://kx.studio/tmp/libncursesw6_6.3-2ubuntu0.1_amd64.deb \
+                && ${SUDO} dpkg -i *.deb && rm *.deb
+            ${SUDO} apt-get install -yqq libtinfo6:riscv64
+        fi
         ${SUDO} apt-get install -yqq --allow-downgrades g++-riscv64-linux-gnu libasound2-dev:riscv64 libdbus-1-dev:riscv64 libgl1-mesa-dev:riscv64 libglapi-mesa:riscv64 libglib2.0-dev:riscv64 liblo-dev:riscv64 libx11-dev:riscv64 libxcursor-dev:riscv64 libxext-dev:riscv64 libxrandr-dev:riscv64 gperf qemu-user-static
         ${SUDO} apt-get clean
     - name: Setup dependencies (linux-x86_64)
